@@ -2,9 +2,10 @@
 # Displays a staff with randomly generated notes appearing at regular intervals
 
 import sys, pygame, random
-import note_maker
+import note_maker, chirp_maker
 
 random.seed()
+pygame.mixer.pre_init(channels=2)
 pygame.init()
 
 # Set canvas size, background refresh color, note speed
@@ -15,6 +16,8 @@ speed = 1000
 
 screen = pygame.display.set_mode(size)
 
+# Load metronome sounds
+list_of_chrips = chirp_maker.make_chirps()
 chirp = pygame.mixer.Sound('snd/1-000.ogg')
 
 # Container of Note objects
@@ -84,8 +87,6 @@ time_increment = 1500
 timer = init_time
 frame = 0
 
-clock = pygame.time.Clock()
-te = 0
 screen.blit(staff, staff_rect)
 screen.blit(list_of_staff_notes[0], list_of_staff_notes_rect[0])
 screen.blit(list_of_staff_notes[1], list_of_staff_notes_rect[1])
@@ -101,18 +102,30 @@ pygame.event.set_blocked(pygame.MOUSEMOTION)
 
 # Main loop reveals notes at fixed interval
 while 1:
-
     event = pygame.event.wait()
-    print(event)
 
-    # Schedule the next event
+    # On each event:
+    #   - Schedule the next chirp
+    #   - Show a new note
     if event.type == my_event:
-        chirp.play()
-        print(pygame.time.get_ticks() - timer)
-        timer = pygame.time.get_ticks()
 
-        #for n in range(116):
-        #    screen.blit(list_of_staff_notes[n], list_of_staff_notes_rect[n])
+        # Schedule a chirp based on latency of this event
+        dt = pygame.time.get_ticks() - timer
+        timer = pygame.time.get_ticks()
+        # delay is the
+        delay = 1010 - dt - 1
+        sound = "1_000"
+        if (delay > 18):
+            delay = 18
+        elif (delay < 0):
+            delay = 0
+
+        chirp = list_of_chrips[delay]
+
+        #print(dt)
+        #print(delay)
+        #print(chirp)
+        chirp.play()
 
         screen.blit(list_of_staff_notes[frame],
                     list_of_staff_notes_rect[frame])
@@ -124,26 +137,3 @@ while 1:
         sys.exit()
     elif event.type == pygame.QUIT:
         sys.exit()
-
-    # dt = clock.tick(8)
-    # te += dt
-    # print(te)
-
-    # if te > speed:
-
-    #     # Clear image, add empty staff, add starting notes
-    #     #screen.fill(white)
-    #     chirp.play()
-
-    #     #for n in range(116):
-    #     #    screen.blit(list_of_staff_notes[n], list_of_staff_notes_rect[n])
-    #     screen.blit(list_of_staff_notes[0], list_of_staff_notes_rect[0])
-    #     screen.blit(list_of_staff_notes[1], list_of_staff_notes_rect[1])
-
-    #     screen.blit(list_of_staff_notes[frame],
-    #                 list_of_staff_notes_rect[frame])
-    #     frame += 1
-
-    #     #for n in range(int(pygame.time.get_ticks() / speed)):
-    #     #    screen.blit(list_of_staff_notes[n], list_of_staff_notes_rect[n])
-    #     te = 0

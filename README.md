@@ -6,8 +6,6 @@ A tool to run sight reading practice sessions that display a musical staff and a
 
 ## To Do
 - Add metronome sound with higher pitch for lead in
-- Increase note range to be from A4 to C6
-- Make larger with random title and tempo markers (bpm and ms) and measure lines
 - Variable tempo
 - Variable note range
 - Variable key
